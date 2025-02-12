@@ -4,24 +4,43 @@
 
 	export let minsToPixels = 2;
 	export let items: TimelineItem[] = [];
+
+	let scrollContainer: HTMLDivElement;
+	let rowHeaders: HTMLDivElement;
+
+	function syncScroll() {
+		if (rowHeaders && scrollContainer) {
+			rowHeaders.scrollTop = scrollContainer.scrollTop;
+		}
+	}
 </script>
 
 <div class="timeline">
-	<div class="header">
-		{#each Array.from({ length: 24 * 4 }) as _, index}
-			<div
-				class="time-label {index % 4 === 0 ? 'bold' : ''}"
-				style="left: {index * 15 * minsToPixels}px; width: {15 *
-					minsToPixels}px; height: calc(40px * {items.length})"
-			>
-				{Math.floor(index / 4)}:{(index % 4) * 15 === 0 ? '00' : (index % 4) * 15}
+	<div class="rowContainer">
+		<div class="rowHeaders" bind:this={rowHeaders}>
+			<div class="rowHeaderTop">HEADER</div>
+			{#each items as item}
+				<div class="rowHeaderItem">{item.name}</div>
+			{/each}
+		</div>
+		<div class="scroll-container" bind:this={scrollContainer} on:scroll={syncScroll}>
+			<div class="rowContents">
+				<div class="time-labels">
+					{#each Array.from({ length: 24 * 4 }) as _, index}
+						<div
+							class="time-label {index % 4 === 0 ? 'bold' : ''}"
+							style="width: {15 * minsToPixels - 1}px;"
+						>
+							{Math.floor(index / 4)}:{(index % 4) * 15 === 0 ? '00' : (index % 4) * 15}
+						</div>
+					{/each}
+				</div>
+
+				{#each items as item}
+					<TimelineRow {item} {minsToPixels} />
+				{/each}
 			</div>
-		{/each}
-	</div>
-	<div class="content">
-		{#each items as item}
-			<TimelineRow {item} {minsToPixels} />
-		{/each}
+		</div>
 	</div>
 </div>
 
@@ -29,59 +48,72 @@
 	.timeline {
 		display: flex;
 		flex-direction: column;
-		padding-top: 50px;
 		position: relative;
-		height: 100vh; /* Damit Sticky funktioniert */
-		overflow: hidden; /* Wichtig: verhindert ungewolltes Scrollen */
+		height: 100vh;
+		overflow: hidden;
 	}
 
-	.content {
+	.rowContainer {
+		display: flex;
+		height: 100%;
 		width: 100%;
-		position: relative;
-		z-index: 10;
-		overflow-y: auto; /* Scrollbar nur für den Inhalt */
-		max-height: calc(100vh - 50px); /* Platz unter der Header-Leiste */
 	}
 
-	.header {
+	.rowHeaders {
+		min-width: 400px;
+		display: flex;
+		flex-direction: column;
+		position: sticky;
+		left: 0;
+		background: white;
+		z-index: 10;
+		overflow-y: hidden; /* Verhindert doppeltes Scrollen */
+	}
+	.rowHeaderItem {
+		min-height: 100px;
+		border-bottom: 1px solid #ccc;
+		padding-top: 20px;
+		border-right: 1px solid #ccc;
+	}
+	.rowHeaderTop {
+		min-height: 37px;
+		border-bottom: 1px solid #ccc;
+		margin-bottom: 0px;
+		border-right: 1px solid #ccc;
 		position: sticky;
 		top: 0;
-		left: 0;
-		height: 50px;
-		width: 100%;
-		background-color: white;
-		z-index: 10;
-		border-bottom: 1px solid #ccc;
+		background: white;
+		z-index: 20;
+	}
+	.scroll-container {
+		overflow-x: auto;
+		overflow-y: auto;
+		flex-grow: 1;
+		white-space: nowrap;
+		position: relative;
+	}
+
+	.rowContents {
+		width: max-content;
+	}
+
+	.time-labels {
+		display: flex;
+		position: sticky;
+		top: 0;
+		background: white;
+		z-index: 15;
 	}
 
 	.time-label {
-		position: absolute;
-		height: 100%;
-		text-align: left;
+		text-align: center;
 		font-size: 12px;
 		border-left: 1px solid #ccc;
 		background-color: #fff;
-		padding-top: 12px;
-		padding-left: 0px;
-	}
-
-	.time-label.bold {
-		font-weight: bold;
-		background-color: #f8f8f8f8;
-	}
-
-	.time-label::before {
-		content: ' ';
-		background-color: #f0f0f0;
+		padding-top: 17px;
+		white-space: nowrap;
+		display: inline-block;
+		height: 20px;
 		border-bottom: 1px solid #ccc;
-		top: 40px;
-		position: absolute;
-		width: 100%;
-		left: 0;
-	}
-
-	.timeline-container {
-		position: relative;
-		height: calc(40px * var(--rows, 1));
 	}
 </style>
