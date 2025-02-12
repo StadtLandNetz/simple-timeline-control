@@ -8,9 +8,20 @@
 	let scrollContainer: HTMLDivElement;
 	let rowHeaders: HTMLDivElement;
 
-	function syncScroll() {
+	let isDragging = false;
+	let startX = 0;
+	let startY = 0;
+	let scrollLeft = 0;
+	let scrollTop = 0;
+
+	function syncScrollContent() {
 		if (rowHeaders && scrollContainer) {
 			rowHeaders.scrollTop = scrollContainer.scrollTop;
+		}
+	}
+	function syncScrollHeader() {
+		if (rowHeaders && scrollContainer) {
+			scrollContainer.scrollTop = rowHeaders.scrollTop;
 		}
 	}
 
@@ -20,11 +31,34 @@
 			minsToPixels = Math.max(0.2, minsToPixels + (event.deltaY > 0 ? -0.2 : 0.2));
 		}
 	}
+
+	function handleMouseDown(event: MouseEvent) {
+		isDragging = true;
+		startX = event.pageX - scrollContainer.offsetLeft;
+		startY = event.pageY - scrollContainer.offsetTop;
+		scrollLeft = scrollContainer.scrollLeft;
+		scrollTop = scrollContainer.scrollTop;
+	}
+
+	function handleMouseMove(event: MouseEvent) {
+		if (!isDragging) return;
+		event.preventDefault();
+		const x = event.pageX - scrollContainer.offsetLeft;
+		const y = event.pageY - scrollContainer.offsetTop;
+		const walkX = (x - startX) * 2; // Scroll-Faktor
+		const walkY = (y - startY) * 2; // Scroll-Faktor
+		scrollContainer.scrollLeft = scrollLeft - walkX;
+		scrollContainer.scrollTop = scrollTop - walkY;
+	}
+
+	function handleMouseUp() {
+		isDragging = false;
+	}
 </script>
 
 <div class="timeline" on:wheel={handleWheel}>
 	<div class="rowContainer">
-		<div class="rowHeaders" bind:this={rowHeaders}>
+		<div class="rowHeaders" bind:this={rowHeaders} on:scroll={syncScrollHeader}>
 			<div class="rowHeaderTop">
 				<div class="controls">
 					<label for="minsToPixels">Mins to Pixels:</label>
@@ -35,7 +69,16 @@
 				<div class="rowHeaderItem">{item.name}</div>
 			{/each}
 		</div>
-		<div class="scroll-container" bind:this={scrollContainer} on:scroll={syncScroll}>
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<div
+			class="scroll-container"
+			bind:this={scrollContainer}
+			on:scroll={syncScrollContent}
+			on:mousedown={handleMouseDown}
+			on:mousemove={handleMouseMove}
+			on:mouseup={handleMouseUp}
+			on:mouseleave={handleMouseUp}
+		>
 			<div class="rowContents">
 				<div class="time-labels">
 					{#each Array.from({ length: 24 * 4 }) as _, index}
@@ -83,7 +126,7 @@
 		left: 0;
 		background: white;
 		z-index: 10;
-		overflow-y: hidden; /* Verhindert doppeltes Scrollen */
+		overflow-y: auto; /* Ermöglicht vertikales Scrollen */
 	}
 	.rowHeaderItem {
 		min-height: 100px;
@@ -107,6 +150,11 @@
 		flex-grow: 1;
 		white-space: nowrap;
 		position: relative;
+		cursor: grab;
+	}
+
+	.scroll-container:active {
+		cursor: grabbing;
 	}
 
 	.rowContents {
