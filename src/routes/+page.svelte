@@ -5,55 +5,62 @@
 
 	let items: TimelineItem[] = [];
 	let minsToPixels = 4;
-	let textareaContent = JSON.stringify([
-		{
-			name: 'Item 1',
-			pu_w_start: '2021-01-01T08:00:00',
-			pu_w_end: '2021-01-01T10:00:00',
-			pu_start: '2021-01-01T09:00:00',
-			pu_end: '2021-01-01T09:30:00',
-			do_w_start: '2021-01-01T11:00:00',
-			do_w_end: '2021-01-01T12:00:00',
-			do_start: '2021-01-01T11:30:00',
-			do_end: '2021-01-01T11:45:00'
-		},
-		{
-			name: 'Item 2',
-			pu_w_start: '2021-01-02T08:30:00',
-			pu_w_end: '2021-01-02T10:30:00',
-			pu_start: '2021-01-02T09:30:00',
-			pu_end: '2021-01-02T09:50:00',
-			do_w_start: '2021-01-02T11:20:00',
-			do_w_end: '2021-01-02T12:20:00',
-			do_start: '2021-01-02T11:50:00',
-			do_end: '2021-01-02T11:55:00'
-		}
-	]);
+	let textareaContent = '';
 
 	onMount(() => {
-		// Initialize items from textarea content if needed
 		updateItemsFromTextarea();
 	});
 
 	function updateItemsFromTextarea() {
-		console.log('🚀 ~ updateItemsFromTextarea ~ updateItemsFromTextarea:');
+		if (!textareaContent.trim()) {
+			console.warn('Textarea is empty, skipping JSON parsing.');
+			items = [];
+			return;
+		}
+
 		try {
-			const parsedItems = JSON.parse(textareaContent);
-			if (Array.isArray(parsedItems)) {
-				items = parsedItems.map((item) => ({
-					...item,
-					pu_w_start: new Date(item.pu_w_start),
-					pu_w_end: new Date(item.pu_w_end),
-					pu_start: new Date(item.pu_start),
-					pu_end: new Date(item.pu_end),
-					do_w_start: new Date(item.do_w_start),
-					do_w_end: new Date(item.do_w_end),
-					do_start: new Date(item.do_start),
-					do_end: new Date(item.do_end)
-				}));
+			let parsedData = JSON.parse(textareaContent);
+
+			// Prüfen, ob es sich um ein verschachteltes JSON-Objekt handelt oder ein direktes Array
+			if (Array.isArray(parsedData)) {
+				// Falls das JSON direkt ein Array ist, verwenden wir es
+				items = parsedData;
+			} else if (parsedData.timeline_items && Array.isArray(parsedData.timeline_items)) {
+				// Falls das JSON-Objekt eine Eigenschaft "timeline_items" enthält
+				items = parsedData.timeline_items;
+			} else {
+				console.error(
+					'JSON format is invalid: Expected an array or an object with "timeline_items".',
+					parsedData
+				);
+				items = [];
+				return;
 			}
-		} catch {
-			console.error('Invalid JSON in textarea');
+
+			// Konvertiere die Strings in Date-Objekte
+			items = items.map((item) => ({
+				name: item.name,
+				id: item.id,
+				pickup_dropoff_minutes: item.pickup_dropoff_minutes,
+				maximum_travel_duration_in_minutes: item.maximum_travel_duration_in_minutes,
+				maximum_waiting_time_in_minutes: item.maximum_waiting_time_in_minutes,
+				waypoint_index: item.waypoint_index,
+
+				pickup_arrival_time: new Date(item.pickup_arrival_time),
+				pickup_departure_time: new Date(item.pickup_departure_time),
+
+				pickup_time_window_start: new Date(item.pickup_time_window_start),
+				pickup_time_window_end: new Date(item.pickup_time_window_end),
+
+				dropoff_time_window_start: new Date(item.dropoff_time_window_start),
+				dropoff_time_window_end: new Date(item.dropoff_time_window_end),
+
+				dropoff_arrival_time: new Date(item.dropoff_arrival_time),
+				dropoff_departure_time: new Date(item.dropoff_departure_time)
+			}));
+		} catch (error) {
+			console.error('Invalid JSON in textarea', error);
+			items = [];
 		}
 	}
 </script>
@@ -66,10 +73,9 @@
 		</div>
 		<textarea
 			bind:value={textareaContent}
-			on:input={() => updateItemsFromTextarea()}
-			placeholder="Enter JSON data here"
-		>
-		</textarea>
+			on:input={updateItemsFromTextarea}
+			placeholder="Paste JSON result here"
+		></textarea>
 	</div>
 	<Timeline {items} {minsToPixels} />
 </div>
@@ -82,7 +88,7 @@
 	.content {
 		display: flex;
 		flex-direction: column;
-		padding-top: 120px; /* Platz für .controls */
+		padding-top: 120px;
 	}
 
 	.controls {
@@ -104,9 +110,11 @@
 	}
 
 	textarea {
-		width: calc(100% - 50px);
-		height: 60px;
-		padding: 0.5rem;
-		resize: vertical;
+		width: 400px;
+		resize: none;
+	}
+	:global(html) {
+		font-size: 14px;
+		font-family: 'Courier New', Courier, monospace;
 	}
 </style>
