@@ -151,7 +151,7 @@
 	.dropoff_time_window_start,
 	.dropoff_arrival_time {
 		position: absolute;
-		transition: all 0.3s ease;
+		/* transition: all 0.3s ease; */
 	}
 	.timeline-container:hover {
 		background-color: #00000008;

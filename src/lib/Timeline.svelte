@@ -13,9 +13,16 @@
 			rowHeaders.scrollTop = scrollContainer.scrollTop;
 		}
 	}
+
+	function handleWheel(event: WheelEvent) {
+		if (event.ctrlKey) {
+			event.preventDefault();
+			minsToPixels = Math.max(0.1, minsToPixels + (event.deltaY > 0 ? -0.1 : 0.1));
+		}
+	}
 </script>
 
-<div class="timeline">
+<div class="timeline" on:wheel={handleWheel}>
 	<div class="rowContainer">
 		<div class="rowHeaders" bind:this={rowHeaders}>
 			<div class="rowHeaderTop">HEADER</div>
