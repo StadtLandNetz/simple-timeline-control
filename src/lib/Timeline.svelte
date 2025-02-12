@@ -15,9 +15,9 @@
 	}
 
 	function handleWheel(event: WheelEvent) {
-		if (event.ctrlKey) {
+		if (event.ctrlKey || event.metaKey || event.shiftKey) {
 			event.preventDefault();
-			minsToPixels = Math.max(0.1, minsToPixels + (event.deltaY > 0 ? -0.1 : 0.1));
+			minsToPixels = Math.max(0.2, minsToPixels + (event.deltaY > 0 ? -0.2 : 0.2));
 		}
 	}
 </script>
@@ -25,7 +25,12 @@
 <div class="timeline" on:wheel={handleWheel}>
 	<div class="rowContainer">
 		<div class="rowHeaders" bind:this={rowHeaders}>
-			<div class="rowHeaderTop">HEADER</div>
+			<div class="rowHeaderTop">
+				<div class="controls">
+					<label for="minsToPixels">Mins to Pixels:</label>
+					<input type="number" id="minsToPixels" bind:value={minsToPixels} step="0.5" min="1" />
+				</div>
+			</div>
 			{#each items as item}
 				<div class="rowHeaderItem">{item.name}</div>
 			{/each}
@@ -58,6 +63,10 @@
 		position: relative;
 		height: 100vh;
 		overflow: hidden;
+	}
+
+	.controls {
+		margin-bottom: 10px;
 	}
 
 	.rowContainer {
@@ -113,7 +122,7 @@
 	}
 
 	.time-label {
-		text-align: center;
+		text-align: left;
 		font-size: 12px;
 		border-left: 1px solid #ccc;
 		background-color: #fff;
@@ -122,6 +131,8 @@
 		display: inline-block;
 		height: 20px;
 		border-bottom: 1px solid #ccc;
+		padding-left: 4px;
+		margin-right: -4px;
 	}
 	.time-label.full-hour {
 		background-color: #f6f6f6;

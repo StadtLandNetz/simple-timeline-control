@@ -67,10 +67,6 @@
 
 <div class="content">
 	<div class="controls">
-		<div class="input-group">
-			<input type="number" bind:value={minsToPixels} />
-			<label for="minsToPixels">Minutes to Pixels</label>
-		</div>
 		<textarea
 			bind:value={textareaContent}
 			on:input={updateItemsFromTextarea}
@@ -88,7 +84,7 @@
 	.content {
 		display: flex;
 		flex-direction: column;
-		padding-top: 120px;
+		padding-top: 70px;
 	}
 
 	.controls {
