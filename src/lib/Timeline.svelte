@@ -28,7 +28,7 @@
 				<div class="time-labels">
 					{#each Array.from({ length: 24 * 4 }) as _, index}
 						<div
-							class="time-label {index % 4 === 0 ? 'bold' : ''}"
+							class="time-label {index % 4 === 0 ? 'full-hour' : ''}"
 							style="width: {15 * minsToPixels - 1}px;"
 						>
 							{Math.floor(index / 4)}:{(index % 4) * 15 === 0 ? '00' : (index % 4) * 15}
@@ -115,5 +115,9 @@
 		display: inline-block;
 		height: 20px;
 		border-bottom: 1px solid #ccc;
+	}
+	.time-label.full-hour {
+		background-color: #f6f6f6;
+		font-weight: bold;
 	}
 </style>

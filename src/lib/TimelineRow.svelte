@@ -7,6 +7,14 @@
 
 <div class="item">
 	<div class="timeline-container" style="width: {24 * 60 * minsToPixels}px;">
+		<div class="time-labels">
+			{#each Array.from({ length: 24 * 4 }) as _, index}
+				<div
+					class="time-label {index % 4 === 0 ? 'full-hour' : ''}"
+					style="width: {15 * minsToPixels - 1}px;"
+				></div>
+			{/each}
+		</div>
 		<div
 			class="pickup_time_window_start"
 			style="left: {minsToPixels *
@@ -111,6 +119,31 @@
 		transition: all 0.1s ease;
 		padding-top: 20px;
 		padding-bottom: 10px;
+	}
+
+	.time-labels {
+		display: flex;
+		position: absolute;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		pointer-events: none;
+	}
+
+	.time-label {
+		text-align: center;
+		font-size: 12px;
+		border-left: 1px solid #e8e8e8;
+		background-color: #fff;
+		padding-top: 17px;
+		white-space: nowrap;
+		display: inline-block;
+		border-bottom: 1px solid #ccc;
+		margin-bottom: -1px;
+	}
+
+	.time-label.full-hour {
+		background-color: #f6f6f6;
 	}
 
 	.pickup_time_window_start,
