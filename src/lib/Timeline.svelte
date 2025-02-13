@@ -30,6 +30,9 @@
 		if (event.ctrlKey || event.metaKey || event.shiftKey) {
 			event.preventDefault();
 			minsToPixels = Math.max(0.2, minsToPixels + (event.deltaY > 0 ? -0.2 : 0.2));
+			if (minsToPixels < 1) {
+				minsToPixels = 1;
+			}
 		}
 	}
 
