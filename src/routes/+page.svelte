@@ -101,10 +101,6 @@
 		gap: 1rem;
 	}
 
-	.input-group {
-		margin-bottom: 1rem;
-	}
-
 	textarea {
 		width: 400px;
 		resize: none;

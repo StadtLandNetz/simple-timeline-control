@@ -9,18 +9,19 @@
 	let rowHeaders: HTMLDivElement;
 
 	let isDragging = false;
+	let isScrollingToItem = false;
 	let startX = 0;
 	let startY = 0;
 	let scrollLeft = 0;
 	let scrollTop = 0;
 
 	function syncScrollContent() {
-		if (rowHeaders && scrollContainer) {
+		if (!isDragging && !isScrollingToItem && rowHeaders && scrollContainer) {
 			rowHeaders.scrollTop = scrollContainer.scrollTop;
 		}
 	}
 	function syncScrollHeader() {
-		if (rowHeaders && scrollContainer) {
+		if (!isDragging && !isScrollingToItem && rowHeaders && scrollContainer) {
 			scrollContainer.scrollTop = rowHeaders.scrollTop;
 		}
 	}
@@ -45,14 +46,28 @@
 		event.preventDefault();
 		const x = event.pageX - scrollContainer.offsetLeft;
 		const y = event.pageY - scrollContainer.offsetTop;
-		const walkX = (x - startX) * 2; // Scroll-Faktor
-		const walkY = (y - startY) * 2; // Scroll-Faktor
+		const walkX = (x - startX) * 1; // Scroll-Faktor
+		const walkY = (y - startY) * 1; // Scroll-Faktor
 		scrollContainer.scrollLeft = scrollLeft - walkX;
 		scrollContainer.scrollTop = scrollTop - walkY;
+		rowHeaders.scrollTop = scrollContainer.scrollTop; // Synchronisiere das vertikale Scrollen
 	}
 
 	function handleMouseUp() {
 		isDragging = false;
+	}
+
+	function scrollToItem(id: string) {
+		const element = document.getElementById(id);
+		console.log('🚀 ~ scrollToItem ~ element:', element);
+		if (element) {
+			isScrollingToItem = true;
+			element.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+			setTimeout(() => {
+				isScrollingToItem = false;
+				rowHeaders.scrollTop = scrollContainer.scrollTop;
+			}, 1000); // Timeout, um die Synchronisation nach dem Scrollen wieder zu aktivieren
+		}
 	}
 </script>
 
@@ -66,7 +81,10 @@
 				</div>
 			</div>
 			{#each items as item}
-				<div class="rowHeaderItem">{item.name}</div>
+				<!-- svelte-ignore a11y_invalid_attribute -->
+				<a href="javascript:void(0);" on:click={() => scrollToItem(item.id)}>
+					<div class="rowHeaderItem">{item.name}</div></a
+				>
 			{/each}
 		</div>
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -133,6 +151,7 @@
 		border-bottom: 1px solid #ccc;
 		padding-top: 20px;
 		border-right: 1px solid #ccc;
+		cursor: pointer;
 	}
 	.rowHeaderTop {
 		min-height: 37px;

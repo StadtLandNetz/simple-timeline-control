@@ -16,6 +16,7 @@
 			{/each}
 		</div>
 		<div
+			id={item.id}
 			class="pickup_time_window_start"
 			style="left: {minsToPixels *
 				(item.pickup_time_window_start.getHours() * 60 +
