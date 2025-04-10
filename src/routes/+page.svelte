@@ -72,6 +72,12 @@
 			on:input={updateItemsFromTextarea}
 			placeholder="Paste JSON result here"
 		></textarea>
+		<div class="legend">
+			<hr class="pickup-time-window"/> pickup time window 
+			<hr class="actual-pickup-time"/> actual pickup time
+			<hr class="dropoff-time-window"/> dropoff time window
+			<hr class="actual-dropoff-time"/> actual dropoff time
+		</div>
 	</div>
 	<Timeline {items} {minsToPixels} />
 </div>
@@ -84,21 +90,17 @@
 	.content {
 		display: flex;
 		flex-direction: column;
-		padding-top: 70px;
 	}
 
 	.controls {
-		position: fixed;
-		top: 0;
-		left: 0;
 		width: 100%;
 		padding: 1rem;
 		background: white;
 		border-bottom: 1px solid #ccc;
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 		display: flex;
-		flex-direction: column;
-		gap: 1rem;
+		flex-direction: row;
+		gap: 10px;
 	}
 
 	textarea {
@@ -108,5 +110,35 @@
 	:global(html) {
 		font-size: 14px;
 		font-family: 'Courier New', Courier, monospace;
+	}
+
+	.legend {
+		display: grid;
+		gap: 2px;
+		align-items: center;
+		grid-template-columns: 0.25fr 1fr;
+		width: 400px;
+
+		hr {
+			width: 30px;
+			height: 8px;
+			border: none;
+		}
+	}
+
+	.pickup-time-window {
+		background-color: #daeafa;
+	}
+
+	.actual-pickup-time {
+		background-color: #076d1f;
+	}
+
+	.dropoff-time-window {
+		background-color: #fff4d7;
+	}
+
+	.actual-dropoff-time {
+		background-color: #b91f2e;
 	}
 </style>
