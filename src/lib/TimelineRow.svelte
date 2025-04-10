@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { TimelineItem } from './types';
+	import type { TimelineItem } from './types'
 
-	export let minsToPixels = 2;
-	export let item: TimelineItem;
+	export let minsToPixels = 2
+	export let item: TimelineItem
 </script>
 
 <div class="item">
